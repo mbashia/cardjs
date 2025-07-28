@@ -1,11 +1,13 @@
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Card.js Payment Form</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/card/2.5.4/jquery.card.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-    <style>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Card.js Payment Form</title>
+        <script
+            src="https://cdnjs.cloudflare.com/ajax/libs/card/2.5.4/jquery.card.min.js"></script>
+        <script
+            src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+        <style>
         body {
             font-family: 'Arial', sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -125,53 +127,59 @@
             color: #666;
         }
     </style>
-</head>
-<body>
-    <div class="container">
-        <h1>💳 Payment Form</h1>
-        
-        <!-- Card visualization will be inserted here -->
-        <div class="card-wrapper" id="card-wrapper"></div>
-        
-        <form id="payment-form">
-            <div class="form-group">
-                <label for="card-number">Card Number</label>
-                <input type="text" id="card-number" name="number" placeholder="1234 5678 9012 3456">
-                <div class="validation-message" id="number-error"></div>
-            </div>
-            
-            <div class="form-group">
-                <label for="card-name">Cardholder Name</label>
-                <input type="text" id="card-name" name="name" placeholder="John Doe">
-                <div class="validation-message" id="name-error"></div>
-            </div>
-            
-            <div class="form-row">
-                <div class="form-group">
-                    <label for="card-expiry">Expiry Date</label>
-                    <input type="text" id="card-expiry" name="expiry" placeholder="MM/YY">
-                    <div class="validation-message" id="expiry-error"></div>
-                </div>
-                
-                <div class="form-group">
-                    <label for="card-cvc">CVC</label>
-                    <input type="text" id="card-cvc" name="cvc" placeholder="123">
-                    <div class="validation-message" id="cvc-error"></div>
-                </div>
-            </div>
-            
-            <button type="submit" class="submit-btn" id="submit-btn">Process Payment</button>
-        </form>
+    </head>
+    <body>
+        <div class="container">
+            <h1>💳 Payment Form</h1>
 
-        <div class="card-info" id="card-info">
-            <h3>Card Information</h3>
-            <p><strong>Type:</strong> <span id="card-type">Unknown</span></p>
-            <p><strong>Valid:</strong> <span id="card-valid">No</span></p>
-            <p><strong>Length:</strong> <span id="card-length">0</span></p>
+            <!-- Card visualization will be inserted here -->
+            <div class="card-wrapper" id="card-wrapper"></div>
+
+            <form id="payment-form">
+                <div class="form-group">
+                    <label for="card-number">Card Number</label>
+                    <input type="text" id="card-number" name="number"
+                        placeholder="1234 5678 9012 3456">
+                    <div class="validation-message" id="number-error"></div>
+                </div>
+
+                <div class="form-group">
+                    <label for="card-name">Cardholder Name</label>
+                    <input type="text" id="card-name" name="name"
+                        placeholder="John Doe">
+                    <div class="validation-message" id="name-error"></div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="card-expiry">Expiry Date</label>
+                        <input type="text" id="card-expiry" name="expiry"
+                            placeholder="MM/YY">
+                        <div class="validation-message" id="expiry-error"></div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="card-cvc">CVC</label>
+                        <input type="text" id="card-cvc" name="cvc"
+                            placeholder="123">
+                        <div class="validation-message" id="cvc-error"></div>
+                    </div>
+                </div>
+
+                <button type="submit" class="submit-btn" id="submit-btn">Process
+                    Payment</button>
+            </form>
+
+            <div class="card-info" id="card-info">
+                <h3>Card Information</h3>
+                <p><strong>Type:</strong> <span
+                        id="card-type">Unknown</span></p>
+                <p><strong>Valid:</strong> <span id="card-valid">No</span></p>
+                <p><strong>Length:</strong> <span id="card-length">0</span></p>
+            </div>
         </div>
-    </div>
 
-    <script>
+        <script>
         $(document).ready(function() {
             // Initialize Card.js
             var card = new Card({
@@ -376,5 +384,5 @@
             checkFormValidity(); // Initial check
         });
     </script>
-</body>
+    </body>
 </html>
