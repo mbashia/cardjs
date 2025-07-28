@@ -1,0 +1,380 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Card.js Payment Form</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/card/2.5.4/jquery.card.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 500px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 30px;
+        }
+
+        .card-wrapper {
+            margin: 0 auto 30px;
+            max-width: 350px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #555;
+            font-weight: bold;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+            box-sizing: border-box;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        input.invalid {
+            border-color: #e74c3c;
+            background-color: #fdf2f2;
+        }
+
+        input.valid {
+            border-color: #27ae60;
+            background-color: #f2fdf2;
+        }
+
+        .form-row {
+            display: flex;
+            gap: 15px;
+        }
+
+        .form-row .form-group {
+            flex: 1;
+        }
+
+        .submit-btn {
+            width: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px;
+            border-radius: 8px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .submit-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .validation-message {
+            margin-top: 5px;
+            font-size: 14px;
+            color: #e74c3c;
+        }
+
+        .card-info {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+
+        .card-info h3 {
+            margin-top: 0;
+            color: #333;
+        }
+
+        .card-info p {
+            margin: 5px 0;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>💳 Payment Form</h1>
+        
+        <!-- Card visualization will be inserted here -->
+        <div class="card-wrapper" id="card-wrapper"></div>
+        
+        <form id="payment-form">
+            <div class="form-group">
+                <label for="card-number">Card Number</label>
+                <input type="text" id="card-number" name="number" placeholder="1234 5678 9012 3456">
+                <div class="validation-message" id="number-error"></div>
+            </div>
+            
+            <div class="form-group">
+                <label for="card-name">Cardholder Name</label>
+                <input type="text" id="card-name" name="name" placeholder="John Doe">
+                <div class="validation-message" id="name-error"></div>
+            </div>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="card-expiry">Expiry Date</label>
+                    <input type="text" id="card-expiry" name="expiry" placeholder="MM/YY">
+                    <div class="validation-message" id="expiry-error"></div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="card-cvc">CVC</label>
+                    <input type="text" id="card-cvc" name="cvc" placeholder="123">
+                    <div class="validation-message" id="cvc-error"></div>
+                </div>
+            </div>
+            
+            <button type="submit" class="submit-btn" id="submit-btn">Process Payment</button>
+        </form>
+
+        <div class="card-info" id="card-info">
+            <h3>Card Information</h3>
+            <p><strong>Type:</strong> <span id="card-type">Unknown</span></p>
+            <p><strong>Valid:</strong> <span id="card-valid">No</span></p>
+            <p><strong>Length:</strong> <span id="card-length">0</span></p>
+        </div>
+    </div>
+
+    <script>
+        $(document).ready(function() {
+            // Initialize Card.js
+            var card = new Card({
+                form: '#payment-form',
+                container: '#card-wrapper',
+                formSelectors: {
+                    numberInput: 'input[name="number"]',
+                    expiryInput: 'input[name="expiry"]',
+                    cvcInput: 'input[name="cvc"]',
+                    nameInput: 'input[name="name"]'
+                },
+                width: 350,
+                formatting: true,
+                messages: {
+                    validDate: 'valid thru',
+                    monthYear: 'MM/YYYY',
+                },
+                placeholders: {
+                    number: '•••• •••• •••• ••••',
+                    name: 'Full Name',
+                    expiry: '••/••',
+                    cvc: '•••'
+                },
+                masks: {
+                    cardNumber: '•' // Custom mask for security
+                },
+                debug: false
+            });
+
+            // Validation functions
+            function validateCardNumber(number) {
+                // Remove spaces and check if it's numeric
+                const cleaned = number.replace(/\s/g, '');
+                if (!/^\d+$/.test(cleaned)) return false;
+                
+                // Basic Luhn algorithm check
+                let sum = 0;
+                let isEven = false;
+                
+                for (let i = cleaned.length - 1; i >= 0; i--) {
+                    let digit = parseInt(cleaned.charAt(i));
+                    
+                    if (isEven) {
+                        digit *= 2;
+                        if (digit > 9) {
+                            digit -= 9;
+                        }
+                    }
+                    
+                    sum += digit;
+                    isEven = !isEven;
+                }
+                
+                return sum % 10 === 0 && cleaned.length >= 13 && cleaned.length <= 19;
+            }
+
+            function validateExpiry(expiry) {
+                const match = expiry.match(/^(\d{2})\/(\d{2})$/);
+                if (!match) return false;
+                
+                const month = parseInt(match[1]);
+                const year = parseInt('20' + match[2]);
+                const now = new Date();
+                const currentYear = now.getFullYear();
+                const currentMonth = now.getMonth() + 1;
+                
+                if (month < 1 || month > 12) return false;
+                if (year < currentYear || (year === currentYear && month < currentMonth)) return false;
+                
+                return true;
+            }
+
+            function validateCVC(cvc) {
+                return /^\d{3,4}$/.test(cvc);
+            }
+
+            function validateName(name) {
+                return name.trim().length >= 2 && /^[a-zA-Z\s]+$/.test(name.trim());
+            }
+
+            function getCardType(number) {
+                const cleaned = number.replace(/\s/g, '');
+                
+                if (/^4/.test(cleaned)) return 'Visa';
+                if (/^5[1-5]/.test(cleaned)) return 'Mastercard';
+                if (/^3[47]/.test(cleaned)) return 'American Express';
+                if (/^6(?:011|5)/.test(cleaned)) return 'Discover';
+                
+                return 'Unknown';
+            }
+
+            // Real-time validation
+            function validateField(input, validator, errorElement) {
+                const isValid = validator(input.val());
+                
+                if (input.val().length === 0) {
+                    input.removeClass('valid invalid');
+                    errorElement.text('');
+                } else if (isValid) {
+                    input.removeClass('invalid').addClass('valid');
+                    errorElement.text('');
+                } else {
+                    input.removeClass('valid').addClass('invalid');
+                    errorElement.text('Invalid ' + input.attr('name'));
+                }
+                
+                return isValid || input.val().length === 0;
+            }
+
+            // Event listeners for validation
+            $('#card-number').on('input', function() {
+                const isValid = validateField($(this), validateCardNumber, $('#number-error'));
+                const cardType = getCardType($(this).val());
+                const cleaned = $(this).val().replace(/\s/g, '');
+                
+                $('#card-type').text(cardType);
+                $('#card-length').text(cleaned.length);
+                $('#card-valid').text(isValid && cleaned.length > 0 ? 'Yes' : 'No');
+            });
+
+            $('#card-name').on('input', function() {
+                validateField($(this), validateName, $('#name-error'));
+            });
+
+            $('#card-expiry').on('input', function() {
+                // Auto-format expiry date
+                let value = $(this).val().replace(/\D/g, '');
+                if (value.length >= 2) {
+                    value = value.substring(0, 2) + '/' + value.substring(2, 4);
+                }
+                $(this).val(value);
+                
+                validateField($(this), validateExpiry, $('#expiry-error'));
+            });
+
+            $('#card-cvc').on('input', function() {
+                validateField($(this), validateCVC, $('#cvc-error'));
+            });
+
+            // Form submission
+            $('#payment-form').on('submit', function(e) {
+                e.preventDefault();
+                
+                const cardNumber = $('#card-number').val();
+                const cardName = $('#card-name').val();
+                const cardExpiry = $('#card-expiry').val();
+                const cardCvc = $('#card-cvc').val();
+                
+                const isNumberValid = validateCardNumber(cardNumber);
+                const isNameValid = validateName(cardName);
+                const isExpiryValid = validateExpiry(cardExpiry);
+                const isCvcValid = validateCVC(cardCvc);
+                
+                // Update field styles
+                validateField($('#card-number'), validateCardNumber, $('#number-error'));
+                validateField($('#card-name'), validateName, $('#name-error'));
+                validateField($('#card-expiry'), validateExpiry, $('#expiry-error'));
+                validateField($('#card-cvc'), validateCVC, $('#cvc-error'));
+                
+                if (isNumberValid && isNameValid && isExpiryValid && isCvcValid) {
+                    $('#submit-btn').prop('disabled', true).text('Processing...');
+                    
+                    // Simulate payment processing
+                    setTimeout(function() {
+                        alert('Payment processed successfully!\n\n' +
+                              'Card Type: ' + getCardType(cardNumber) + '\n' +
+                              'Last 4 digits: ' + cardNumber.replace(/\s/g, '').slice(-4) + '\n' +
+                              'Cardholder: ' + cardName);
+                        
+                        $('#submit-btn').prop('disabled', false).text('Process Payment');
+                        
+                        // Reset form
+                        $('#payment-form')[0].reset();
+                        $('.valid, .invalid').removeClass('valid invalid');
+                        $('.validation-message').text('');
+                        $('#card-type').text('Unknown');
+                        $('#card-valid').text('No');
+                        $('#card-length').text('0');
+                    }, 2000);
+                } else {
+                    alert('Please fix the validation errors before submitting.');
+                }
+            });
+
+            // Disable submit button initially
+            function checkFormValidity() {
+                const cardNumber = $('#card-number').val();
+                const cardName = $('#card-name').val();
+                const cardExpiry = $('#card-expiry').val();
+                const cardCvc = $('#card-cvc').val();
+                
+                const allValid = validateCardNumber(cardNumber) && 
+                               validateName(cardName) && 
+                               validateExpiry(cardExpiry) && 
+                               validateCVC(cardCvc);
+                
+                $('#submit-btn').prop('disabled', !allValid);
+            }
+
+            // Check form validity on input
+            $('#payment-form input').on('input', checkFormValidity);
+            checkFormValidity(); // Initial check
+        });
+    </script>
+</body>
+</html>
